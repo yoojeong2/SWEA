@@ -1,0 +1,74 @@
+#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+#define MAX 201
+int Start = 1; 
+int N,K;
+int End = N;
+int Cnt,ans;
+bool Visit[MAX];
+int belt[MAX];
+queue<int> Robot;
+void convey_belt() 
+{
+	// 벨트 한 칸씩 시계방향으로 회전 
+	Start--;
+	End--;
+	if (Start < 1) Start = 2*N;
+	if (End < 1)End = 2 * N;
+}
+void robot_Move() 
+{
+	int robotNum = Robot.size();
+	for (int i = 0;i < robotNum;i++) {
+		int curP = Robot.front();
+		Visit[curP] = false;
+		Robot.pop();
+
+		if (curP == End) continue; // Robot belt 하차
+		
+		int nextP = curP + 1;
+		if (nextP > 2 * N) nextP = 1;
+		if (belt[nextP] > 0 && Visit[nextP] == false) { // 이동 가능한 경우
+			belt[nextP]--;
+			if (belt[nextP] == 0)Cnt++;
+			if (nextP == End) continue;
+			Visit[nextP] = true;
+			Robot.push(nextP);
+		}
+		else { // 이동 불가능한 경우
+			
+			Visit[curP] = true;
+			Robot.push(curP);
+		}
+	}
+}
+void new_Robot() {
+	if (Visit[Start] == false && belt[Start] >= 1) {
+		Visit[Start] = true;
+		belt[Start]--;
+		Robot.push(Start);
+
+		if (belt[Start] == 0)Cnt++;
+	}
+}
+int main(void) {
+
+
+	cin >> N >> K;
+	for (int i = 1;i <= 2 * N;i++) {
+		cin >> belt[i];
+	}
+	Start = 1;
+	End = N;
+
+	while (Cnt < K) {
+		ans++;
+
+		convey_belt();
+		robot_Move();
+		new_Robot();
+	}
+	cout << ans << endl;
+}
