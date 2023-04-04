@@ -1,0 +1,68 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define MAX 1002
+#define X first
+#define Y second
+
+int N, M;
+int dx[4] = { -1,0,1,0 };
+int dy[4] = { 0,1,0,-1 };
+int visited[MAX][MAX];
+int box[MAX][MAX];
+queue<pair<int, int>> q;
+int day;
+void BFS() {
+
+	while (!q.empty()) {
+		pair<int, int> cur = q.front(); q.pop();
+		for (int dir = 0;dir < 4;dir++) {
+
+			int nx = cur.X + dx[dir];
+			int ny = cur.Y + dy[dir];
+			if (nx < 0 && nx >= N && ny < 0 && ny >= M) continue; // out of boundary
+			if (visited[nx][ny] >= 0 || box[nx][ny]==-1) continue; // 기존 방문 했거나 토마토 없는 칸은 실행 안함 
+			
+				q.push({ nx,ny });
+				visited[nx][ny] = visited[cur.X][cur.Y] + 1;
+				day = visited[nx][ny];
+		}
+	}
+
+}
+int main(void) {
+	ios::sync_with_stdio(false);
+	cin.tie(0);
+	int ans = 0;
+	cin >> M >> N;
+	bool chk = true;
+	for (int i = 0;i < N;i++) {
+		for (int j = 0;j < M;j++) {
+			cin >> box[i][j];
+			visited[i][j] = -1;
+
+			if (box[i][j] == 1) 
+			{
+				q.push({ i,j });
+				visited[i][j] = 0;
+			}
+
+		}
+	}
+	BFS();
+	
+	for (int i = 0;i < N;i++) {
+		for (int j = 0;j < M;j++) {
+			if (visited[i][j] == -1 && box[i][j] == 0) {
+				ans = -1;
+				cout << ans << endl;
+				chk = false;
+				break;
+			}
+			ans = max(ans, visited[i][j]);
+		}
+		if(!chk) break;
+	}
+	if (chk) { cout << ans << endl; }
+
+	return 0;
+}
