@@ -1,0 +1,48 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+#define MAX 101
+#define X first
+#define Y second
+
+queue<pair<int, int>> q;
+int N, M;
+int maP[MAX][MAX] = { 0, };
+bool visited[MAX][MAX] = { false, };
+int dist[MAX][MAX] = { 0 };
+int dx[4] = {-1,0,1,0};
+int dy[4] = { 0,1,0,-1 };
+void BFS(pair<int,int> start) {
+	q.push(start);
+	visited[start.X][start.Y] = true;
+	dist[start.X][start.Y] = 1;
+	while (!q.empty()) 
+	{
+		pair<int, int> cur = q.front(); q.pop();
+		for (int dir = 0;dir < 4;dir++) {
+			int nx = cur.X + dx[dir];
+			int ny = cur.Y + dy[dir];
+			if (nx >= 0 && nx < N && ny >= 0 && ny < M && visited[nx][ny] == false && maP[nx][ny] == 1) {
+				visited[nx][ny] = true;
+				dist[nx][ny] = dist[cur.X][cur.Y] + 1;
+				q.push({ nx,ny });
+			}
+			if ((nx == N - 1) && (ny == M - 1)) return;
+		}
+	}
+}
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	cin >> N >> M;
+	for (int i = 0;i < N;i++) {
+		string s;
+		cin >> s;
+		for (int j = 0;j < M;j++) {
+			maP[i][j] = s[j] - '0'; // map 분해
+		}
+	}
+	BFS({ 0,0 }); // 항상 0,0에서 시작함 
+	cout << dist[N-1][M-1] << endl;
+	return 0;
+}
