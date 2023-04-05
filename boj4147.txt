@@ -1,0 +1,71 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define MAX 1001
+#define X first
+#define Y second
+
+int N, M;
+int dx[4] = { -1,0,1,0 };
+int dy[4] = { 0,1,0,-1 };
+string mAp[MAX];
+int person[MAX][MAX];
+int fire[MAX][MAX];
+
+int main(void) {
+	ios::sync_with_stdio(false);
+	cin.tie(0);
+	int ans = 0;
+	cin >> M >> N;
+	memset(person, -1, sizeof(person));
+	memset(fire, -1, sizeof(fire));
+	for (int i = 0;i < N;i++) {
+		cin >> mAp[i];
+	}
+	queue< pair<int, int>> q1;
+	queue< pair<int, int>> q2;
+	for (int i = 0;i < N;i++) {
+		for (int j = 0;j < M;j++) {
+			if (mAp[i][j] == 'F') {
+				q1.push({ i,j });
+				fire[i][j] = 0; // 불이 있음 
+			}
+			if (mAp[i][j] == 'J') {
+				q2.push({ i,j });
+				person[i][j] = 0;
+			}
+		}
+	}	
+	// 불에 대한 BFS
+	while (!q1.empty()) {
+		auto cur = q1.front(); 	q1.pop();
+		for (int dir = 0; dir < 4; dir++) {
+			int nx = cur.X + dx[dir];
+			int ny = cur.Y + dy[dir];
+
+			if (nx < 0 && nx >= N && ny < 0 && ny >= M && mAp[nx][ny] != '#' && fire[nx][ny] == 0) 
+			{ //벽이 아니고 불이 있는 경우 
+				fire[nx][ny] = fire[cur.X][cur.Y] + 1;
+				q1.push({ nx,ny });
+			}
+		}
+	}
+	while (!q2.empty()) {
+		auto cur = q2.front(); 	q2.pop();
+		for (int dir = 0;dir < 4;dir++) {
+			int nx = cur.X + dx[dir];
+			int ny = cur.Y + dy[dir];
+			if (nx < 0 || nx >= N || ny < 0 || ny >= M)
+			{ // 바운더리 벗어남 (탈출)
+				cout << person[cur.X][cur.Y] + 1;
+				return 0;
+			}
+			if (fire[nx][ny] != -1 && fire[nx][ny] <= person[cur.X][cur.Y] + 1) continue; //불이 사람보다 나중에 도달함 
+			if (mAp[nx][ny] == '#' || person[nx][ny] >= 0) continue; // 벽에 도달햇거나 시간 증가면 그냥 패스 
+				person[nx][ny] = person[cur.X][cur.Y] + 1; //사람 이동 시간 추가 
+				q2.push({ nx,ny }); //다음 이동 위치 큐에 넣기 
+			
+		}
+	}
+	cout << "IMPOSSIBLE" << endl;
+	return 0;
+}
