@@ -20,16 +20,16 @@ void rotate(int pt)
 			int nx = cx + dx[direction];
 			int ny = cy + dy[direction]; // 다음 위치의 값
 			
-			if (nx == i && ny == i)break;
+			if (nx == i && ny == i)break; //시작 점으로 되돌아오면 종료 
 			if (nx >= i && N - i > nx && ny >= i && ny < M - i) {
-				A[cx][cy] = A[nx][ny];
+				A[cx][cy] = A[nx][ny];// 바로 옆 꺼를 지금 위치로 복사함 
 				cx = nx; cy = ny;
 			}// 범위 내
 			else {
-				direction++;
+				direction++; //범위 벗어나면 방향 전환 
 			}
 		}
-		A[i + 1][i] = startVal;
+		A[i + 1][i] = startVal; //처음 값 복사 
 
 	}
 }
