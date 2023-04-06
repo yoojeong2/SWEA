@@ -1,0 +1,107 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define MAX 50
+
+int N, M, K;
+struct Fireball {
+	int r, c, mass, speed, direction;
+	Fireball(int r, int c, int m, int s, int d) :r(r), c(c), mass(m), speed(s), direction(d) {}
+};
+const int dy[8] = { -1,-1,0,1,1,1,0,-1 };
+const int dx[8] = { 0,1,1,1,0,-1,-1,-1 };
+
+vector<Fireball> board[MAX][MAX];
+
+Fireball Move(Fireball f) {
+	for (int i = 0;i < f.speed;i++) {
+		f.r += dy[f.direction];
+		if (f.r == N)f.r = 0;
+		else if (f.r == -1)f.r = N-1;
+
+		f.c += dx[f.direction];
+		if (f.c == N)f.c = 0;
+		else if (f.c == -1)f.c = N-1;
+	}
+	return f;
+}
+
+void moveFBalls() {
+	vector<Fireball> nB[MAX][MAX];
+
+	for (int i = 0;i < N;i++) {
+		for (int j = 0;j < N;j++) {
+			for (Fireball f : board[i][j]) {
+				Fireball nxt = Move(f);
+				nB[nxt.r][nxt.c].push_back(nxt); //이동 된 위치에 넣
+			}
+		}
+	}
+	for (int i = 0;i < N;i++) {
+		for (int j = 0;j < N;j++) {
+			board[i][j] = nB[i][j];
+		}
+	}
+}
+void sumBalls() {
+	for (int i = 0;i < N;i++) {
+		for (int j = 0;j < N;j++) {
+			int sumM = 0; int sumD = 0;int sumS = 0;
+
+			int ballCnt = board[i][j].size();
+			if (ballCnt < 2) continue; // 하나만 있으면 변동 없음
+
+			for (Fireball f: board[i][j])
+			{
+				sumM += f.mass;
+				sumS += f.speed;
+				if ((f.direction % 2) == 0) sumD += 1;
+				else sumD -= 1;
+			}
+			board[i][j].clear();
+			
+			if (sumM/5 == 0)continue;// 합친 질량이 0이면 추가 X, 소멸
+
+			
+			if (abs(sumD) == ballCnt)//모든방향이홀수이거나짝수
+			{
+				board[i][j].push_back(Fireball(i, j, sumM / 5, sumS / ballCnt, 0));
+				board[i][j].push_back(Fireball(i, j, sumM / 5, sumS / ballCnt, 2));
+				board[i][j].push_back(Fireball(i, j, sumM / 5, sumS / ballCnt, 4));
+				board[i][j].push_back(Fireball(i, j, sumM / 5, sumS / ballCnt, 6));
+			}
+			else {//모든방향같진않음
+				board[i][j].push_back(Fireball(i, j, sumM / 5, sumS / ballCnt, 1));
+				board[i][j].push_back(Fireball(i, j, sumM / 5, sumS / ballCnt, 3));
+				board[i][j].push_back(Fireball(i, j, sumM / 5, sumS / ballCnt, 5));
+				board[i][j].push_back(Fireball(i, j, sumM / 5, sumS / ballCnt, 7));
+			}
+			
+		}
+	}
+}
+
+int main(void) {
+	ios::sync_with_stdio(0);
+	cin.tie(0);
+	
+	cin >> N >> M >> K;
+	for (int i = 0;i < M;i++) {
+		int r, c, m, s, d;
+		cin >> r >> c >> m >> s >> d;
+		board[r - 1][c - 1].push_back(Fireball(r - 1, c - 1, m, s, d));
+	}
+	while (K--) { // 이동 횟수 K
+
+		moveFBalls();
+		sumBalls();
+	}
+	int ans = 0;
+	for (int i = 0;i < N;i++)
+		for (int j = 0;j < N;j++)
+			for (Fireball f : board[i][j])
+				ans += f.mass;
+
+	cout << ans<<endl;
+	return 0;
+}
