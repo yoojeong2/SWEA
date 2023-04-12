@@ -1,0 +1,81 @@
+#include <string>
+#include <vector>
+#define MAX 50
+using namespace std;
+#define E 0
+#define S 1
+#define W 2
+#define Nor 3
+
+int N,M;
+int dx[] = {0,1,0,-1};
+int dy[] = {1,0,-1,0};
+int cX,cY;
+void chkRange(vector<string> park,int val, int dir){
+    int nX = cX + dx[dir]*val;
+    int nY = cY + dy[dir]*val;
+    bool flag = true;
+    //범위 벗어나면 이동 수행 안함 
+    if(nX<0 || nX >=N ||nY<0 || nY>=M  ) flag = false;
+    else // 범위 내인 경우 이동하며 이동 불가능한 지점 있는지 확인 
+    {
+        
+        for(int i = min(cX,nX);i<=max(cX,nX);i++)
+        {
+             for(int j = min(cY,nY);j<=max(cY,nY);j++)
+             {
+                 if(park[i][j]=='X') flag = false;
+             }
+        }
+    }
+    if(flag){
+            cX = nX;
+            cY = nY;
+        }
+}
+vector<int> solution(vector<string> park, vector<string> routes) {
+    vector<int> answer;
+    
+    N = park.size(); // X
+    M = park[0].length(); //Y
+    
+    for(int i=0;i<N;i++)
+    {
+        for(int j=0;j<M;j++)
+        {
+            if(park[i][j] == 'S'){
+                cY = j;
+                cX = i;
+            }
+        }
+    }
+    for(auto r: routes)
+    {
+        int dir = 0;
+        switch(r[0])
+        {
+            case 'E': {
+                dir = E;
+                break;
+                      }
+            case 'S': {
+                dir = S;
+                break;
+                      }
+            case 'W': {
+                dir = W;
+                break;
+                      }
+            case 'N': {
+                dir = Nor;
+                break;
+                      }
+            default: break;
+        }
+        chkRange(park,(r[2]-'0'),dir);
+    }
+    answer.push_back(cX);
+    answer.push_back(cY);
+    
+    return answer;
+}
